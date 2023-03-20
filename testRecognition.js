@@ -30,6 +30,15 @@ paintCheck.setStrokeWidth(3);
 var padding = 150;
 var btHeight = 130;
 
+var pResult = new Lourah.android.games.Screen.Pane();
+pResult.setFrame(0, 2*screen.getHeight()/3 + 1*padding, screen.getWidth(), screen.getHeight()/3 - 2 * padding);
+pResult.setHandler((pane) => {
+    var canvas = pane.getCanvas();
+    canvas.drawColor(_p(android.graphics.Color.LTGRAY));
+    pane.flush();
+    }
+  );
+
 function Control(drawPad, x, y) {
 
   var b = new Lourah.android.games.Screen.Pane(android.widget.Button);
@@ -47,17 +56,17 @@ function Control(drawPad, x, y) {
           console.log("scan.P::" + scan.P.length);
           console.log("G::[" + scan.G + "]");
           console.log("R::" + scan.R);
-          var canvas = drawPad.getPad().getCanvas();
+          var canvas = pResult.getCanvas();
           //canvas.drawCircle(scan.G[0], scan.G[1], 5, paintCheck);
           //canvas.drawCircle(scan.G[0], scan.G[1], scan.R, paintCheck);
           var p = scan.P[0];
-          var k = 100/scan.R;
+          var k = 200/scan.R;
           for(var i = 1; i < scan.P.length; i++) {
             canvas.drawLine(
-              200+k*p[0]
-              , 200+k*p[1]
-              , 200+k*scan.P[i][0]
-              , 200+k*scan.P[i][1],
+              canvas.getWidth()/2+k*p[0]
+              , canvas.getHeight()/2+k*p[1]
+              , canvas.getWidth()/2+k*scan.P[i][0]
+              , canvas.getHeight()/2+k*scan.P[i][1],
                paintCheck);
             p = scan.P[i];
             }
@@ -93,9 +102,16 @@ pTest.getPad().setHandler((pane) => {
   );
 
 
+
+bCompare = new Lourah.android.games.Screen.Pane(android.widget.Button);
+bCompare.setFrame(0, 2*screen.getHeight()/3 + 10, screen.getWidth(), btHeight);
+screen.addPane(bCompare);
+bCompare.getView().setText("Compare...");
+
 screen.addPane(pBackground);
 screen.addPane(pReference.getPad());
 screen.addPane(pTest.getPad());
+screen.addPane(pResult);
 
 var [b, t] = [
   new Control(pReference, 0, 10)
