@@ -58,7 +58,10 @@ function Control(drawPad, x, y) {
           console.log("R::" + scan.R);
           var canvas = pResult.getCanvas();
           //canvas.drawCircle(scan.G[0], scan.G[1], 5, paintCheck);
-          //canvas.drawCircle(scan.G[0], scan.G[1], scan.R, paintCheck);
+          canvas.drawCircle(
+            canvas.getWidth()/2
+            , canvas.getHeight()/2
+            , 200, paintCheck);
           var p = scan.P[0];
           var k = 200/scan.R;
           for(var i = 1; i < scan.P.length; i++) {

@@ -43,22 +43,28 @@ var _p = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O?(c)
         }
 	    G[0] = G[0]/s.length;
 	    G[1] = G[1]/s.length;
-      var rhos = [];
+      const toDeg = 180/Math.PI;
       for (i = 0; i < s.length; i++) {
-        s[i] = [
+        var [x, y] = [
           s[i][0] - G[0]
           , s[i][1] - G[1]
           ];
-        rhos.push(Math.sqrt(
-            s[i][0] * s[i][0]
-            + s[i][1] * s[i][1]
-            ));
+        
+        var r = Math.sqrt(
+            x*x
+            + y*y
+            );
+      
+        var t = Math.atan2(x, y)*toDeg;
+        
+        s[i] = [x, y, r, t<0?(t+360):t];
         }
+      s.sort((a,b) => a[3] - b[3]);
       var mRhos = 0;
-      for (i = 0; i < rhos.length; i++) {
-        mRhos += rhos[i];
+      for (i = 0; i < s.length; i++) {
+        mRhos += s[i][2];
         }
-      mRhos = mRhos / rhos.length;
+      mRhos = mRhos / s.length;
       return {
         P: s       // set of points
         , G: G     // Barycentre
