@@ -70,7 +70,7 @@ function Control(drawPad, x, y) {
               , canvas.getHeight()/2+k*p[1]
               , canvas.getWidth()/2+k*scan.P[i][0]
               , canvas.getHeight()/2+k*scan.P[i][1],
-               paintCheck);
+              paintCheck);
             p = scan.P[i];
             }
           } catch(e) {
@@ -107,9 +107,31 @@ pTest.getPad().setHandler((pane) => {
 
 
 bCompare = new Lourah.android.games.Screen.Pane(android.widget.Button);
-bCompare.setFrame(0, 2*screen.getHeight()/3 + 10, screen.getWidth(), btHeight);
+bCompare.setFrame(0, 2*screen.getHeight()/3 + 10, screen.getWidth()/2, btHeight);
+bClear = new Lourah.android.games.Screen.Pane(android.widget.Button);
+bClear.setFrame(screen.getWidth()/2, 2*screen.getHeight()/3 + 10, screen.getWidth()/2, btHeight);
+
 screen.addPane(bCompare);
+screen.addPane(bClear);
+
 bCompare.getView().setText("Compare...");
+bClear.getView().setText("Clear");
+
+bClear.getView().setOnClickListener({
+    onClick: v => {
+      try {
+        pResult.getCanvas().drawColor(_p(android.graphics.Color.LTGRAY));
+        pResult.flush();
+        //pReference.getPad().getCanvas().drawColor(_p(android.graphics.Color.WHITE));
+        //pReference.getPad().flush();
+        pTest.getPad().getCanvas().drawColor(_p(android.graphics.Color.WHITE));
+        pTest.getPad().flush();
+        } catch(e) {
+        console.log("bClear::" + e);
+        }
+      }
+    });
+
 
 screen.addPane(pBackground);
 screen.addPane(pReference.getPad());

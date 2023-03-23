@@ -8,3 +8,5 @@ a color policy.
 the set of pounts is stored as x, y, and polar
 representation. sorted from polar angle.
 
+addef clear button
+
