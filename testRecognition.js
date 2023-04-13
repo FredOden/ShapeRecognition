@@ -1,6 +1,7 @@
 Activity.importScript(Lourah.jsFramework.parentDir() + "/Lourah.android.games.Screen.js");
 Activity.importScript(Lourah.jsFramework.dir() + '/Lourah.shape.recognition.js');
 Activity.importScript(Lourah.jsFramework.dir() + '/DrawPad.js');
+Activity.importScript(Lourah.jsFramework.dir() + '/Lourah.utils.math.interpolation.js');
 
 
 Activity.setTitle("Test Recognition");
@@ -39,8 +40,11 @@ pResult.setHandler((pane) => {
     }
   );
 
-function Control(drawPad, x, y) {
+var interval = new Lourah.utils.math.interpolation.Interval(0, 360, 1);
 
+
+function Control(drawPad, x, y) {
+  this.polar = [];
   var b = new Lourah.android.games.Screen.Pane(android.widget.Button);
   b.setFrame(x, y, screen.getWidth(), btHeight);
   screen.addPane(b);
@@ -48,14 +52,15 @@ function Control(drawPad, x, y) {
   b.getView().setOnClickListener({
       onClick: (v) => {
         try {
-          console.log("clicked");
+          //console.log("clicked");
           var scan = Lourah.shape.recognition.scan(
             drawPad.getPad().getView().getDrawable().getBitmap()
             ,4
             );
-          console.log("scan.P::" + scan.P.length);
-          console.log("G::[" + scan.G + "]");
-          console.log("R::" + scan.R);
+          //console.log("scan.P::" + scan.P.length);
+          //console.log("G::[" + scan.G + "]");
+          //console.log("R::" + scan.R);
+          this.polar = scan.Polar;
           var canvas = pResult.getCanvas();
           //canvas.drawCircle(scan.G[0], scan.G[1], 5, paintCheck);
           canvas.drawCircle(
@@ -142,5 +147,37 @@ var [b, t] = [
   new Control(pReference, 0, 10)
   , new Control(pTest, 0, screen.getHeight()/3 + 10)
   ];
+
+bCompare.getView().setOnClickListener({
+    onClick: v => {
+      try {
+        //console.log("b.polar.length::" + b.polar.length);
+        //console.log("t.polar.length::" + t.polar.length);
+        var [bc, tc] = [
+          interval.apply(b.polar)
+          , interval.apply(t.polar)
+          ];
+        delta = 0;
+        //console.log("bc.length::" + bc.length);
+        //console.log("tc.length::" + tc.length);
+        
+        for(var i = 0; i < bc.length; i++) {
+          delta += (bc[i][1] - tc[i][1]);
+          /*
+          console.log(
+            bc[i][0] + "::" + tc[i][0]
+            + ", " + bc[i][1] + "::" + tc[i][1]
+            + " => " + delta
+            );
+          /**/
+          }
+        console.log("delta::" + delta/bc.length);
+        /**/
+        } catch (e) {
+        console.log("Compare::" + e + "::" + e.stack);
+        }
+      }
+    }
+  )
 
 Activity. setContentView(screen.getLayout());

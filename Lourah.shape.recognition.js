@@ -61,6 +61,27 @@ var _p = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O?(c)
         }
       mRhos = mRhos / s.length;
       
+      var invMRhos = 1/mRhos;
+      var polar = [];
+      
+      polar[0] = [
+        s[s.length - 1][3] - 360
+        , s[s.length - 1][2]*invMRhos
+        ];
+      
+      for(i = 0; i < s.length; i++) {
+        polar[i+1] = [
+          s[i][3]
+          , s[i][2] * invMRhos
+          ];
+        }
+      
+      polar[s.length + 1] = [
+        polar[1][0] + 360
+        , polar[1][1]
+        ];
+      
+      
       /*
       var i = 0;
       for(var a = 0; a < 360; a++) {
@@ -72,6 +93,7 @@ var _p = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O?(c)
         P: s       // set of points
         , G: G     // Barycentre
         , R: mRhos // mean distance from G
+        , Polar: polar
         }
       }
 
