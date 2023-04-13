@@ -20,7 +20,14 @@ pBackground.setHandler((pane) => {
 var paint = new android.graphics.Paint();
 paint.setColor(_p(android.graphics.Color.BLACK));
 paint.setStyle(android.graphics.Paint.Style.STROKE);
+paint.setTextSize(220);
 paint.setStrokeWidth(1);
+
+var paintLetter = new android.graphics.Paint();
+paintLetter.setColor(_p(android.graphics.Color.BLACK));
+paintLetter.setStyle(android.graphics.Paint.Style.FILL);
+paintLetter.setTextSize(220);
+paintLetter.setStrokeWidth(1);
 
 var paintCheck = new android.graphics.Paint();
 paintCheck.setColor(_p(android.graphics.Color.BLUE));
@@ -58,15 +65,38 @@ pResult.setHandler((pane) => {
 var interval = new Lourah.utils.math.interpolation.Interval(
   0
   , 360
-  , 15
+  , 30
   );
 
 
 function Control(drawPad, x, y) {
   this.polar = [];
   var b = new Lourah.android.games.Screen.Pane(android.widget.Button);
-  b.setFrame(x, y, screen.getWidth(), btHeight);
+  b.setFrame(x, y, screen.getWidth()/2, btHeight);
   screen.addPane(b);
+  
+  var et = new Lourah.android.games.Screen.Pane(android.widget.EditText);
+  et.setFrame(x + screen.getWidth()/2, y, 150, btHeight);
+  screen.addPane(et);
+  
+  var bt = new Lourah.android.games.Screen.Pane(android.widget.Button);
+  bt.setFrame(x + 150 + screen.getWidth()/2, y, 150, btHeight);
+  screen.addPane(bt);
+  
+  bt.getView().setText("¶");
+  bt.getView().setOnClickListener({
+      onClick: (v) => {
+        try {
+          var canvas = drawPad.getPad().getCanvas();
+          canvas.drawColor(_p(android.graphics.Color.WHITE));
+          canvas.drawText(et.getView().getText(), 200, 300, paintLetter);
+          } catch(e) {
+          console.log("bt::" + e);
+          }
+        }
+      }
+    );
+  
   b.getView().setText("Scan ...");
   b.getView().setOnClickListener({
       onClick: (v) => {
@@ -112,6 +142,7 @@ pReference.getPad().setHandler((pane) => {
     pane.setOnTouchListener(pReference.onTouchListener);
     var canvas = pane.getCanvas();
     canvas.drawColor(_p(android.graphics.Color.WHITE));
+    
     pane.flush();
     }
   );
@@ -167,6 +198,8 @@ var [b, t] = [
   , new Control(pTest, 0, screen.getHeight()/3 + 10)
   ];
 
+
+
 bCompare.getView().setOnClickListener({
     onClick: v => {
       try {
@@ -192,15 +225,15 @@ bCompare.getView().setOnClickListener({
         var [sbt, sb, st, sd] = [0, 0, 0, 0];
         
         for(var i = 0; i < bc.length; i++) {
-          var [bi, ti, di] = [
+          var [bi, ti] = [
             (bc[i][1] - bm)
-            , (tc[i][1] - tm)
-            , Math.abs(bc[i][1] - tc[i][1])
+            ,(tc[i][1] - tm)
             ];
+          
           sbt += bi*ti;
           sb += bi*bi;
           st += ti*ti;
-          sd += di*di;
+          sd += (bi+ti)*(bi+ti)/4;
           }
 
         var stat;
@@ -213,14 +246,33 @@ bCompare.getView().setOnClickListener({
           + ", tm::" + tm.toFixed(2)
           );
         
-        delta = sbt/(Math.sqrt(sb)*Math.sqrt(st)*Math.sqrt(sd));
+        delta = sbt/(Math.sqrt(sb)*Math.sqrt(st));
 
         console.log("delta::" + delta.toFixed(2));
         var canvas = pResult.getCanvas();
         var toX = p => p[0]*2.5 + 50;
         var toY = p => 400 - p[1]*200;
+        
+        
+        canvas.drawLine(
+          toX(bc[0])
+          , toY([0,bm])
+          , toX(bc[bc.length - 1])
+          , toY([0,bm])
+          , paintPolarb
+          );
+          
+        canvas.drawLine(
+          toX(tc[0])
+          , toY([0,tm])
+          , toX(tc[tc.length - 1])
+          , toY([0,tm])
+          , paintPolart
+          );
+        
         for(i = 0; i < bc.length; i++) {
           if (i===0) continue;
+          
           canvas.drawLine(
             toX(bc[i-1])
             , toY(bc[i-1])
@@ -236,7 +288,8 @@ bCompare.getView().setOnClickListener({
             , paintPolart
             );
           }
-        canvas.drawText("delta::" + delta.toFixed(2), 100, 50, paintResult);
+        var bis = delta/Math.sqrt(sd);
+        canvas.drawText("delta::" + delta.toFixed(2) + ", bis::" + bis, 100, 50, paintResult);
         canvas.drawText(stat, 100, 400, paintResult);
         /**/
         } catch (e) {
