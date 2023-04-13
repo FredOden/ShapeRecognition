@@ -25,8 +25,23 @@ paint.setStrokeWidth(1);
 var paintCheck = new android.graphics.Paint();
 paintCheck.setColor(_p(android.graphics.Color.BLUE));
 paintCheck.setStyle(android.graphics.Paint.Style.STROKE);
-paintCheck.setStrokeWidth(3);
+paintCheck.setStrokeWidth(1);
 
+var paintPolarb = new android.graphics.Paint();
+paintPolarb.setColor(_p(android.graphics.Color.MAGENTA));
+paintPolarb.setStyle(android.graphics.Paint.Style.STROKE);
+paintPolarb.setStrokeWidth(5);
+var paintPolart = new android.graphics.Paint();
+paintPolart.setColor(_p(android.graphics.Color.YELLOW));
+paintPolart.setStyle(android.graphics.Paint.Style.STROKE);
+paintPolart.setStrokeWidth(5);
+
+var paintResult = new android.graphics.Paint();
+paintResult.setColor(_p(android.graphics.Color.RED));
+paintResult.setStyle(android.graphics.Paint.Style.FILL);
+paintResult.setTextSize(42);
+paintResult.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+//paintResult.setStrokeWidth(3);
 
 var padding = 150;
 var btHeight = 130;
@@ -40,7 +55,11 @@ pResult.setHandler((pane) => {
     }
   );
 
-var interval = new Lourah.utils.math.interpolation.Interval(0, 360, 1);
+var interval = new Lourah.utils.math.interpolation.Interval(
+  0
+  , 360
+  , 15
+  );
 
 
 function Control(drawPad, x, y) {
@@ -157,21 +176,68 @@ bCompare.getView().setOnClickListener({
           interval.apply(b.polar)
           , interval.apply(t.polar)
           ];
-        delta = 0;
-        //console.log("bc.length::" + bc.length);
-        //console.log("tc.length::" + tc.length);
+        var delta = 0;
+        
+        //console.log(t.polar[t.polar.length-1]);
+        
+        var [bm, tm] = [0, 0];
         
         for(var i = 0; i < bc.length; i++) {
-          delta += (bc[i][1] - tc[i][1]);
-          /*
-          console.log(
-            bc[i][0] + "::" + tc[i][0]
-            + ", " + bc[i][1] + "::" + tc[i][1]
-            + " => " + delta
-            );
-          /**/
+          bm += bc[i][1];
+          tm += tc[i][1];
           }
-        console.log("delta::" + delta/bc.length);
+        bm = bm/bc.length;
+        tm = tm/tc.length;
+        
+        var [sbt, sb, st, sd] = [0, 0, 0, 0];
+        
+        for(var i = 0; i < bc.length; i++) {
+          var [bi, ti, di] = [
+            (bc[i][1] - bm)
+            , (tc[i][1] - tm)
+            , Math.abs(bc[i][1] - tc[i][1])
+            ];
+          sbt += bi*ti;
+          sb += bi*bi;
+          st += ti*ti;
+          sd += di*di;
+          }
+
+        var stat;
+        console.log(
+          stat = "sbt::" + sbt.toFixed(2)
+          + ", sb::" + Math.sqrt(sb).toFixed(2)
+          + ", st::" + Math.sqrt(st).toFixed(2)
+          + ", sd::" + Math.sqrt(sd).toFixed(2)
+          + ", bm::" + bm.toFixed(2)
+          + ", tm::" + tm.toFixed(2)
+          );
+        
+        delta = sbt/(Math.sqrt(sb)*Math.sqrt(st)*Math.sqrt(sd));
+
+        console.log("delta::" + delta.toFixed(2));
+        var canvas = pResult.getCanvas();
+        var toX = p => p[0]*2.5 + 50;
+        var toY = p => 400 - p[1]*200;
+        for(i = 0; i < bc.length; i++) {
+          if (i===0) continue;
+          canvas.drawLine(
+            toX(bc[i-1])
+            , toY(bc[i-1])
+            , toX(bc[i])
+            , toY(bc[i])
+            , paintPolarb
+            );
+          canvas.drawLine(
+            toX(tc[i-1])
+            , toY(tc[i-1])
+            , toX(tc[i])
+            , toY(tc[i])
+            , paintPolart
+            );
+          }
+        canvas.drawText("delta::" + delta.toFixed(2), 100, 50, paintResult);
+        canvas.drawText(stat, 100, 400, paintResult);
         /**/
         } catch (e) {
         console.log("Compare::" + e + "::" + e.stack);

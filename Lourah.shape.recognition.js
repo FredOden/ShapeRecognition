@@ -30,7 +30,7 @@ var _p = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O?(c)
             }
           }
         }
-      var G = s[0];
+      var G = [s[0][0], s[0][1]];
       for (var i = 1; i < s.length; i++) {
         G[0] += s[i][0];
         G[1] += s[i][1];
@@ -53,11 +53,13 @@ var _p = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O?(c)
         var t = Math.atan2(x, y)*toDeg;
 
         s[i] = [x, y, r, t<0?(t+360):t];
+        //console.log("s::[" + i + "]::" + s[i]);
         }
       s.sort((a,b) => a[3] - b[3]);
       var mRhos = 0;
       for (i = 0; i < s.length; i++) {
         mRhos += s[i][2];
+        
         }
       mRhos = mRhos / s.length;
       

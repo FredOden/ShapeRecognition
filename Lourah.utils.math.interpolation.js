@@ -10,6 +10,11 @@ var Lourah = Lourah || {};
       const mu2 = (1 - Math.cos((x - p1[0])/(p2[0] - p1[0]) * Math.PI))/ 2;
       return (p1[1] * (1 - mu2)) + (p2[1] * mu2);
       };
+    
+    const linearInterpolator = (p1, p2, x) => {
+      const mu2 = (x - p1[0])/(p2[0] - p1[0]);
+      return (p1[1] * (1 - mu2)) + (p2[1] * mu2);
+      };
 
 
     /**
